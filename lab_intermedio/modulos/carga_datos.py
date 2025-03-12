@@ -87,7 +87,7 @@ def plot_fitted_curve(fitting_function, imprimir, titulo, **datasets):
     # Crear la figura con dos subgráficos
     fig, ax = plt.subplots(2, 1, figsize=(8, 6), sharex=True, gridspec_kw={'height_ratios': [3, 2], 'hspace':0})
 
-    colors = ["#800080", 'b', 'g', 'm', 'c', 'y']  # Paleta de colores para múltiples conjuntos
+    colors = ['y', 'b', 'g', 'm', 'c', "#800080"]  # Paleta de colores para múltiples conjuntos
 
     for i, (label, data) in enumerate(datasets.items()):
         x, y, error, popt, formula_text, name = data["x"], data["y"], data["error"], data["popt"], data["formula_text"], data["name"]
