@@ -85,13 +85,15 @@ def plot_fitted_curve(fitting_function, imprimir, titulo, **datasets):
     """
     
     # Crear la figura con dos subgráficos
-    fig, ax = plt.subplots(2, 1, figsize=(8, 6), sharex=True, gridspec_kw={'height_ratios': [3, 2], 'hspace':0})
+    fig, ax = plt.subplots(2, 1, figsize=(8, 6), sharex=True, gridspec_kw={'height_ratios': [3, 2], 'hspace': 0})
 
-    colors = ['y', 'b', 'g', 'm', 'c', "#800080"]  # Paleta de colores para múltiples conjuntos
+    colors = ['r', 'b', 'g', 'm', 'c', "#800080"]  # Paleta de colores para múltiples conjuntos
+    markers = ['o', 'x', 's', '^', 'D', '*']  # Lista de marcadores para múltiples conjuntos
 
     for i, (label, data) in enumerate(datasets.items()):
         x, y, error, popt, formula_text, name = data["x"], data["y"], data["error"], data["popt"], data["formula_text"], data["name"]
         color = colors[i % len(colors)]  # Selecciona un color cíclico
+        marker = markers[i % len(markers)]  # Selecciona un marcador cíclico
 
         # Calcular el ajuste
         x_fit = np.linspace(min(x), max(x), 100)
@@ -101,25 +103,54 @@ def plot_fitted_curve(fitting_function, imprimir, titulo, **datasets):
         residuals = (y - fitting_function(x, *popt)) / error
 
         # Graficar los datos con barras de error
-        ax[0].errorbar(x, y, yerr=error, fmt="o", color=color, label=f"Datos {name}", capsize=8, ecolor="r")
+        ax[0].errorbar(x, y, yerr=error, fmt=marker, color=color, label=f"Datos {name}", capsize=8)
         ax[0].plot(x_fit, y_fit, linestyle="--", color=color, label=f"Ajuste {name}: {formula_text}")
 
         # Graficar los residuales
-        ax[1].scatter(x, residuals, color=color, label=f"Residuales {name}", s=7)
+        ax[1].scatter(x, residuals, color=color, label=f"Residuales {name}", s=30, marker=marker)
 
     # Configuración de la gráfica superior
-    ax[0].set_ylabel("Radio (cm)")
-    ax[0].legend()
+    ax[0].set_ylabel("Diámetro (cm)")
+    ax[0].legend(fontsize=6.5)
     ax[0].set_title(titulo)
 
     # Configuración de la gráfica de residuales
     ax[1].axhline(0, color='black', linestyle='dashed')
-    ax[1].set_xlabel("Desplazamiento (μm)")
-    ax[1].set_ylabel("Residuales")
-    ax[1].legend()
+    ax[1].set_xlabel(r"$\frac{1}{\sqrt{V}}$ (V)")
+    ax[1].set_ylabel("Residuales normalizados")
+    ax[1].legend(fontsize=6.5)
 
     # Guardar en PDF si imprimir es True
+    k = np.random.randint(1, 10)
     if imprimir:
-        plt.savefig(f'{titulo}.pdf', format='pdf')
+        plt.savefig(f'figura_{k}.pdf', format='pdf')
 
     plt.show()
+
+
+#Función que dado un conjunto de datos, me calcula la desviación estándar y a cuantas desviaciones estandar se encuentra cada dato
+def calcular_sigmas(datos, poblacional=True):
+    """
+    Calcula la desviación estándar de un conjunto de datos y a cuántas desviaciones estándar está cada dato.
+    
+    Parámetros:
+    - datos: lista o array de números.
+    - poblacional: si es True, calcula la desviación estándar poblacional (ddof=0).
+                   si es False, calcula la desviación estándar muestral (ddof=1).
+    
+    Retorna:
+    - media: la media de los datos.
+    - desviacion: la desviación estándar calculada.
+    - sigmas: lista con los valores de cuántas desviaciones estándar está cada dato.
+    """
+    datos = np.array(datos)  # Convertir a array de numpy
+    media = np.mean(datos)  # Calcular la media
+    ddof = 0 if poblacional else 1  # Definir si es poblacional o muestral
+    desviacion = np.std(datos, ddof=ddof)  # Calcular desviación estándar
+    
+    if desviacion == 0:
+        raise ValueError("La desviación estándar es cero, todos los datos son iguales.")
+
+    sigmas = (datos - media) / desviacion  # Calcular cuántas desviaciones estándar está cada dato
+
+    return media, desviacion, sigmas
