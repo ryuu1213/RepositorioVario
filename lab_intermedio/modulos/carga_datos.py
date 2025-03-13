@@ -7,6 +7,7 @@ from scipy.optimize import curve_fit
 #Cosas a mejorar en el código
 #1.Modificar el codigo para que pueda aceptar varias fitting functions
 #2.Modificar el código para que pueda imprimir a libertad las unidades dada un titulo de la forma "x(<unidades>)"
+
 def plot_excel_sheets(excel_file, imprimir):
 
     """
@@ -110,7 +111,7 @@ def plot_fitted_curve(fitting_function, imprimir, titulo, **datasets):
         ax[1].scatter(x, residuals, color=color, label=f"Residuales {name}", s=30, marker=marker)
 
     # Configuración de la gráfica superior
-    ax[0].set_ylabel("Diámetro (cm)")
+    ax[0].set_ylabel("Diámetro (m)")
     ax[0].legend(fontsize=6.5)
     ax[0].set_title(titulo)
 
